@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<title>Yes or No</title>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+  </head>
+
+  <body>
+	<div id='question'></div>
+	<button id='yes'>yes</button>
+	<button id='no'>no</button>
+  </body>
+
+	<script>
+		$('#yes, #no').click(function(){
+			$.ajax({
+			  url: "/res",
+			  data: {text:$(this).attr('id')},
+			  success: function( data ) {
+			  alert(data);
+			  }
+			});
+		});	
+
+      setInterval(function(){
+            $.ajax({
+              url: "/question",
+              data: {},
+              success: function( data ) {
+                console.log(data);
+				if(data != 'none') $('#question').html(data);
+
+              }
+            });
+      },1000);
+	</script>
+</html>

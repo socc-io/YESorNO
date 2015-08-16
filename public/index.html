@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<title>Yes or No</title>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+  </head>
+
+  <body>
+	<textarea id='text'>hello</textarea>
+	<button id='submit'>submit</button>
+	<div id='history'></div>
+	<div id='result'>none</div>
+  </body>
+
+	<script>
+		$('#submit').click(function(){
+			$.ajax({
+			  url: "/submit",
+			  data: {text:$('#text').val()},
+			  success: function( data ) {
+				$('<div class=\"log\">'+data+'</div>').appendTo('#history');
+				
+				alert(data);
+			  }
+			});
+		});	
+
+		setInterval(function(){
+			$.ajax({
+			  url: "/answer",
+			  data: {},
+			  success: function( data ) {
+			    console.log(data);
+				if(data != 'none') $('#result').html(data);
+			  }
+			});
+		},1000);
+	</script>
+</html>

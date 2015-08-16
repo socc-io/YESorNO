@@ -1,0 +1,14 @@
+<html>
+	<head><title>로그인</title></head>
+	<body>
+		<textarea id="login"></textarea>
+		<button id="login_btn">Login</button>	
+		<script>
+			$("#login_btn").click(function(){
+				var _id = $("#login").val();
+				window.location="/main?id="+_id";
+			});
+		</script>
+	<body>
+	
+</html>
