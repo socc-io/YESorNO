@@ -1,46 +1,71 @@
-var http = require('http');
-var express = require('express');
-var fs = require('fs');
-var app = express();
+var app = require('express')();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
 
-app.use(express.static(__dirname + '/public'));
-
-var answer = 'None';
-var question = 'None';
-
-var _Global={};
-_Global.Dynamic=[{}];//team name
-
-
-
-app.get('/submit', function (req, res) {
-  question = req.query.text;
-  _Global.Dynamic[0].id="hi";
-  _Global.Dynamic[0].No=1;
-  console.log(_Global.Dynamic[0].No +" "+_Global.Dynamic[0].id);
-  res.send(question);
+app.get('/', function(req, res){
+  res.sendfile('index.html');
 });
 
-app.get('/res', function (req, res) {
-  answer = req.query.text;
+var room = {};
+var socket_map = {};
+
+io.on('connection', function(user_socket){
+
+  user_socket.on('send',function(packet){
+	console.log('socket.io : send');
+
+	var key = packet['chat_room_key'];
+	var id = packet['chat_member_id'];
+	var type = packet['chat_type'];
+	var text = packet['chat_text'];
+
+	room[key]['chats'].push({
+		'chat_member_id':id,
+		'chat_type':type,
+		'chat_text':text
+	});
+
+	broad_packet = {
+		'chat_history': room[key]['chats']
+	}
+	
+	console.log(broad_packet);
+	for(i in room[key]['members']){
+		room[key]['members'][i]['socket'].emit(
+			'broadcast',broad_packet
+		);
+	}
+  });
+
+  user_socket.on('disconnect', function(data){
+	console.log("socket.io : disconnect");
+	for( key in room ){
+		var memlist = room[key]['members'];
+		var rmcnt = 0;
+		for( mi in memlist ){
+			mi -= rmcnt;
+			if(user_socket.id == memlist[mi]['socket'].id){
+				memlist.splice(mi,1);
+				rmcnt +=1 ;
+			}
+		}
+	}
+  });
+
+  user_socket.on('login',function(packet){
+	console.log('socket.io : login');
+    var key = packet['chat_room_key'];
+	var id = packet['chat_member_id'];
+	var sobj = {'id':id,'socket':user_socket}
+	if(room[key] == undefined){
+		room[key] = {'members' : [sobj], 'chats' : []};
+	}else{
+		room[key]['members'].push(sobj);
+	}
+	console.log(room);
+  });
 });
 
-app.get('/answer', function (req, res) {
-  var tmp = answer;
-  answer = 'none';
-  res.send(tmp);
+http.listen(3000, function(){
+  console.log('listening on *:3000');
 });
-
-app.get('/question', function (req, res) {
-  var tmp = question;
-  question = 'none';
-  res.send(tmp);
-});
-
-var server = app.listen(3000, function () {
-  var host = server.address().address;
-  var port = server.address().port;
-
-  console.log('Example app listening at http://%s:%s', host, port);
-});
-

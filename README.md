@@ -1,2 +1,2 @@
 # YESorNO
-Yes or No game
+Yes or No chat based web game
