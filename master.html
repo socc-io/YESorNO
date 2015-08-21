@@ -20,19 +20,14 @@
   <div id="login">
     <div class="row">
       <div class="col-lg-6">
-        <input name="key" type="text" class="form-control" placeholder="팜플렛에 적힌 키를 입력하세요." value="dpdp">
+        <div class="input-group">
+          <input name="key" type="text" class="form-control" placeholder="팜플렛에 적힌 키를 입력하세요." value="dpdp">
+          <span class="input-group-btn">
+              <button class="login btn btn-default" type="button">Go!</button>
+          </span>
+        </div>
       </div><!-- /.col-lg-6 -->
     </div>
-    <div class="row">
-      <div class="col-lg-6">
-        <div class="input-group">
-          <input name="nickname"  type="text" class="form-control" placeholder="사용하실 닉네임을 입력하세요.">
-          <span class="input-group-btn">
-            <button class="login btn btn-default" type="button">Go!</button>
-          </span>
-        </div><!-- /input-group -->
-      </div><!-- /.col-lg-6 -->
-    </div><!-- /.row -->
   </div>
   <div id="chat" style="display:none">
     <div id="status">
@@ -71,9 +66,9 @@
 
     $('.login').click(function(){
       var key = $('input[name=key]').val();
-      var id = $('input[name=nickname]').val();
+      var id = 'master';
       socket.room = key;
-      socket.nickname = id;
+      socket.nickname = 'master';
       
       socket.emit('login',{chat_room_key : key , chat_member_id : id});
       
@@ -91,7 +86,7 @@
       var text = $(this).val();
       
       if(code == 13 && text != ''){
-        socket.emit('send',{chat_type:'default', chat_text: text, chat_time: get_time() });
+        socket.emit('send',{chat_type:'notice', chat_text: text, chat_time: get_time() });
         $(this).val('');  
       } else if (text == '\n'){
         $(this).val('');  
