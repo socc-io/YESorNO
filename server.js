@@ -15,18 +15,18 @@ app.get('/master', function(req, res){
 var room = {};
 
 //방, 유저 리스트 및 카운터 전달
-var get_status = function(){
-  var status = [];
+var get_state = function(){
+  var state = [];
   var index = 0;
   
   for(i in room){
-    status.push({'room' : Object.getOwnPropertyNames(room)[index],
+    state.push({'room' : Object.getOwnPropertyNames(room)[index],
                  'count' : room[i].count
                 });
     index++;
   }
          
-  return status;
+  return state;
 }
 
 io.on('connection', function(user_socket){
@@ -34,6 +34,7 @@ io.on('connection', function(user_socket){
   user_socket.on('login',function(packet){
     var key = packet['chat_room_key'];
     var id = packet['chat_member_id'];
+    var access = true;
     
     if(key != '' && id != ''){
       user_socket.room = key;
@@ -46,27 +47,29 @@ io.on('connection', function(user_socket){
       else if( room[key]['members'].indexOf(id) == -1 )
         room[key]['members'].push(id);
       else 
-        user_socket.emit('access',false); 
-    
-      console.log( key+" - '"+id+"'님이 입장했습니다.");
-      
-      //채팅방 데이터 보내기
-      user_socket.emit('load', {
-        'chat_status' : get_status(),
-        'chat_count' : room[key]['count'],
-        'chat_members' : room[key]['members'],
-        'chat_history' : room[key]['chats']
-      });
-      
-      //상태 새로고침
-      io.sockets.emit('refresh',{
-        'chat_status': get_status(),
-        'chat_key' : key,
-        'chat_members' : room[key]['members'],
-      });
-      
-      user_socket.emit('access',true);
-      
+        access = false;
+        
+      if( access ){
+        console.log( key+" - '"+id+"'님이 입장했습니다.");
+
+        //채팅방 데이터 보내기
+        user_socket.emit('load', {
+          'chat_state' : get_state(),
+          'chat_count' : room[key]['count'],
+          'chat_members' : room[key]['members'],
+          'chat_history' : room[key]['chats']
+        });
+
+        //상태 새로고침
+        io.sockets.emit('refresh',{
+          'chat_state': get_state(),
+          'chat_key' : key,
+          'chat_members' : room[key]['members'],
+        });
+        user_socket.emit('access',true);
+      }
+      else
+        user_socket.emit('access',false);
     } else{
      user_socket.emit('access',false); 
     }
@@ -95,11 +98,19 @@ io.on('connection', function(user_socket){
     
     //상태 새로고침
     io.sockets.emit('refresh',{
-      'chat_status': get_status()
+      'chat_state': get_state()
     });
   });
+  
+  user_socket.on('typing',function(packet){
+    var key = user_socket.room;
+    var id = user_socket.nickname;
+    var state = packet.state;
+    
+    io.sockets.in(key).emit('typing', {'id': id, 'state': state});
+  });
 
-  user_socket.on('disconnect', function(data){
+  user_socket.on('disconnect', function(packet){
     var key = user_socket.room;
     var id = user_socket.nickname;
     
@@ -110,7 +121,7 @@ io.on('connection', function(user_socket){
 
       memlist.splice(memlist.indexOf(id),1);
       io.sockets.emit('refresh',{
-        'chat_status': get_status(),
+        'chat_state': get_state(),
         'chat_key' : key,
         'chat_members' : room[key]['members'],
       });

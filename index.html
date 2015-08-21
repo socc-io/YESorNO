@@ -62,7 +62,9 @@
         <ul class="media-list">
         </ul>
       </div>
-      <footer><input name="chat" type="text" class="form-control" placeholder="messages" aria-describedby="basic-addon1"></footer>
+      <footer><input name="chat" type="text" class="form-control" placeholder="messages" aria-describedby="basic-addon1">
+        <div class="typing"><span style="display:none"></span>&nbsp;</div>
+      </footer>
     </div>
   </div>
   
@@ -86,23 +88,23 @@
         }
       });
     });   
-    $('input[name="chat"]').keydown(function(e){
+    $('input[name="chat"]').keypress(function(e){
       var code = (e.keyCode ? e.keyCode : e.which);
       var text = $(this).val();
       
       if(code == 13 && text != ''){
         socket.emit('send',{chat_type:'default', chat_text: text, chat_time: get_time() });
-        $(this).val('');  
-      } else if (text == '\n'){
-        $(this).val('');  
+        $(this).val('');
+        socket.emit('typing', { state : 'end'} );
       }
+      else socket.emit('typing',{ state : 'ing'} );
     });
-    
+  
     // 소켓 이벤트
     socket.on('load',function(o){load(o)});
     socket.on('broadcast',function(o){broadcast(o)});
     socket.on('refresh',function(o){refresh(o)});
-    
+    socket.on('typing',function(o){typing(o)});
   </script>
 </body>
 </html>

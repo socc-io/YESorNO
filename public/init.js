@@ -1,4 +1,16 @@
 var temp;
+
+var bottom_scroll = function(){
+  $("div.message").scrollTop( $("div.message")[0].scrollHeight + $('div.message').outerHeight() );
+}
+var get_time = function(){
+  var dt = new Date();
+  var h =  dt.getHours(), m = dt.getMinutes();
+  var time = (h > 12) ? (h-12 + ':' + m +' PM') : (h + ':' + m +' AM');
+  
+  return time;
+}
+
 var add_RoomList = function(data){
   $('.team-list').empty();
   
@@ -28,15 +40,8 @@ var add_Message = function(data){
     var message = '<li class="media"><div class="media-left"><img class="media-object img-circle" src="'+img+'" alt="img"></div><div class="media-body"><h4 class="media-heading nickname">'+id+'<span class="time">'+time+'</span></h4>'+text+'</div></li>'
     $('.media-list').append(message);
   }
-  $("div.message").scrollTop( $("div.message")[0].scrollHeight + $('div.message').outerHeight() )
+  bottom_scroll();
 };
-var get_time = function(){
-  var dt = new Date();
-  var h =  dt.getHours(), m = dt.getMinutes();
-  var time = (h > 12) ? (h-12 + ':' + m +' PM') : (h + ':' + m +' AM');
-  
-  return time;
-}
 
 var load = function(o){
   $('#nickname').html(socket.nickname);
@@ -44,11 +49,12 @@ var load = function(o){
   $('.badge.me').html(o['chat_count']);
 
   //room, user 리스트 추가
-  add_RoomList(o['chat_status']);
+  add_RoomList(o['chat_state']);
   add_UserList(o['chat_members']);
   
   //이전 채팅 로드
   add_Message(o['chat_history']);
+  bottom_scroll();
 }
 var broadcast = function(o){
   $('.badge.me').html(o['count']);
@@ -57,6 +63,13 @@ var broadcast = function(o){
 var refresh = function(o){
   //room, user 리스트 갱신
   temp = o;
-  add_RoomList(o['chat_status']);
+  add_RoomList(o['chat_state']);
   if(o['chat_key'] == socket.room) add_UserList(o['chat_members']);
 };
+var typing = function(o){
+  temp = o;
+  if( socket.nickname != o.id && o.state == 'ing' ){
+    $('.typing span').html(o.id+'님이 입력중입니다.');
+    $('.typing span').fadeIn();
+  } else if( o.state == 'end') $('.typing span').fadeOut();   
+}
