@@ -33,7 +33,7 @@ html, body,#chat {
   background-color: #fff
   }
   .chat h3 { margin: 0 7px; }
-    .breadcrumb { padding: 10px 0; margin-bottom: 10px; background-color: #fff; }
+    .breadcrumb { float: left; padding: 10px 0; margin-bottom: 10px; background-color: #fff; }
     .breadcrumb .badge {
       position: absolute;
       margin-left: 10px;
@@ -45,8 +45,10 @@ html, body,#chat {
       font-size: 17px;
     }
     .team-name { color: #555459 }
+    .master_tool { float: right }
+      .master_tool li { margin-left: 5px; float: left }
 
-  .message { height: calc( 100% - 140px ); padding-left: 10px; overflow-y: auto; outline: 0; }
+  .message { display: inline-block; height: calc( 100% - 140px ); padding-left: 10px; overflow-y: auto; outline: 0; }
     .media-object{ height: 45px; width: 45px }
     .media-heading { font-size: 15px; font-weight: 600; }
     .media-heading span.time{ margin-left: 8px; font-size: 12px; font-weight: 200; color: #babbbf; }

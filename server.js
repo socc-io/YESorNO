@@ -102,6 +102,29 @@ io.on('connection', function(user_socket){
     });
   });
   
+  user_socket.on('count_tool',function(packet){
+    var key = user_socket.room;
+    var type = packet.type;
+    var val = packet.value;
+    
+    console.log(packet);
+    console.log(key+" "+type+" "+val);
+    if( type == 'edit' ){
+      room[key].count = val;
+      io.sockets.emit('refresh',{
+        'chat_state': get_state(),
+        'chat_count': val
+      });
+    }else if( type == 'reset' ){
+      room[key].count = 0;
+      io.sockets.emit('refresh',{
+        'chat_state': get_state(),
+        'chat_count': 0
+      });
+    }
+    
+  });
+  
   user_socket.on('typing',function(packet){
     var key = user_socket.room;
     var id = user_socket.nickname;
@@ -113,17 +136,28 @@ io.on('connection', function(user_socket){
   user_socket.on('disconnect', function(packet){
     var key = user_socket.room;
     var id = user_socket.nickname;
+    var chat_members;
     
     if ( key != undefined ){
       var memlist = room[key].members;
       
       console.log( key+" - '"+id+"'님이 퇴장했습니다.");
 
+      //멤버 제거
       memlist.splice(memlist.indexOf(id),1);
+      //방 폭파!      
+      if( memlist.length == 0 ){
+        user_socket.leave(key);
+        delete room[key];
+        chat_members = undefined;
+      } else {
+        chat_members = room[key]['members'];
+      }
+      
       io.sockets.emit('refresh',{
         'chat_state': get_state(),
         'chat_key' : key,
-        'chat_members' : room[key]['members'],
+        'chat_members' : chat_members,
       });
     }
   });

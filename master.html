@@ -52,6 +52,12 @@
           <li><a>team</a></li>
           <li><span class="team-name"></span><span class="badge me"></span></li>
         </ol>
+        <ul class="master_tool" >
+          <li style="width:140px"><div class="col-lg-12" style="padding:0"><div class="input-group"><input name="count" type="text" class="form-control" placeholder="count"><span class="input-group-btn"><button name="edit" type="button" class="btn btn-default"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Edit</button>
+      </span>
+    </div></li>
+          <li><button name="reset" type="button" class="btn btn-default"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> Reset</button></li>
+        </ul>
       </h3>
       <div class="message">
         <ul class="media-list">
@@ -95,6 +101,9 @@
       else socket.emit('typing',{ state : 'ing'} );
     });
   
+    $('button[name="edit"]').click(function(){count_tool(socket,'edit',$('input[name="count"]').val())});
+    $('button[name="reset"]').click(function(){count_tool(socket,'reset')});
+    
     // 소켓 이벤트
     socket.on('load',function(o){load(o)});
     socket.on('broadcast',function(o){broadcast(o)});

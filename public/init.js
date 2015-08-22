@@ -43,6 +43,10 @@ var add_Message = function(data){
   bottom_scroll();
 };
 
+var count_tool = function(socket,type,value){
+  socket.emit('count_tool',{'type' : type, 'value' : value });
+}
+
 var load = function(o){
   $('#nickname').html(socket.nickname);
   $('.team-name').html(socket.room);
@@ -62,9 +66,9 @@ var broadcast = function(o){
 };
 var refresh = function(o){
   //room, user 리스트 갱신
-  temp = o;
   add_RoomList(o['chat_state']);
   if(o['chat_key'] == socket.room) add_UserList(o['chat_members']);
+  if(o['chat_count'] != undefined) $('.badge.me').html(o['chat_count']);
 };
 var typing = function(o){
   temp = o;
