@@ -64,7 +64,7 @@
   </div>
   
   <script>
-    var socket = io.connect('localhost',{port:3000});
+    var socket = io.connect(location.hostname,{port:3000});
 
     $('.login').click(function(){
       var key = $('input[name=key]').val();
