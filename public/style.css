@@ -45,7 +45,7 @@ html, body,#chat {
       font-size: 17px;
     }
     .team-name { color: #555459 }
-    .master_tool { float: right }
+    .master_tool { float: right; margin-top: 10px }
       .master_tool li { margin-left: 5px; float: left }
 
   .message { display: inline-block; height: calc( 100% - 140px ); padding-left: 10px; overflow-y: auto; outline: 0; }
