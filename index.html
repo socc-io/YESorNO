@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <!-- 합쳐지고 최소화된 최신 CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="style.css">
@@ -58,6 +59,7 @@
           <li><span class="team-name"></span><span class="badge me"></span></li>
         </ol>
       </h3>
+      <a class="mobile"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a>
       <div class="message">
         <ul class="media-list">
         </ul>
@@ -99,7 +101,22 @@
       }
       else socket.emit('typing',{ state : 'ing'} );
     });
-  
+    
+    //사이드 메뉴 이벤트
+    $('a.mobile').click(function(){
+      $('#status').animate({ 'right' : 0 });
+      event.stopPropagation();
+    });
+    $('.chat').click(function(){
+      if($('#status').css('right') == '0px')
+        $('#status').animate({ 'right' : -220 });
+    });
+    $('#status').click(function(){
+      if($('#status').css('right') == '0px')
+        $('#status').animate({ 'right' : -220 });
+    });
+    
+    
     // 소켓 이벤트
     socket.on('load',function(o){load(o)});
     socket.on('broadcast',function(o){broadcast(o)});

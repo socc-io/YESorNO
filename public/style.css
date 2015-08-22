@@ -33,6 +33,7 @@ html, body,#chat {
   background-color: #fff
   }
   .chat h3 { margin: 0 7px; }
+  a[event="moblie"] { display: none; }
     .breadcrumb { float: left; padding: 10px 0; margin-bottom: 10px; background-color: #fff; }
     .breadcrumb .badge {
       position: absolute;
@@ -43,10 +44,12 @@ html, body,#chat {
       background-color: #ff5252;
       padding: 3px 0;
       font-size: 17px;
+      margin-top: 3px;
     }
     .team-name { color: #555459 }
     .master_tool { float: right; margin-top: 10px }
       .master_tool li { margin-left: 5px; float: left }
+      a.mobile{ display: none }
 
   .message { display: inline-block; height: calc( 100% - 140px ); padding-left: 10px; overflow-y: auto; outline: 0; }
     .media-object{ height: 45px; width: 45px }
@@ -62,3 +65,31 @@ html, body,#chat {
     }
     .typing { padding: 2px 5px; font-size: 12px; color: #ababab; }
     .form-control{ height: 35px!important; resize: none; overflow: hidden}
+
+@media (max-width: 768px) {
+  #status{
+    right: -220px;
+    float: right;
+    z-index: 1;
+  }
+  .chat{
+    width: 100%;
+    margin-left: 0;
+    }
+    .chat h3{ position: absolute; }
+      a.mobile { 
+        display: block !important;
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        right: 10px;
+        top: 15px;
+        font-size: 20px;
+        line-height: 40px;
+        text-align: center;
+        color: #337ab7;
+      }
+    .message { position: absolute; top: 70px; display: block;}
+  
+  footer { left: 20px; }
+}
