@@ -12,9 +12,21 @@ app.get('/', function(req, res){
 app.get('/master', function(req, res){
   res.sendfile('master.html');
 });
-var room = {};
 
-//방, 유저 리스트 및 카운터 전달
+var room = {
+  'Dijkstra' : { 'key': 272, 'count': 0, 'members' : [], 'chats' : [] },
+  'Prim' : { 'key': 134, 'count': 0, 'members' : [], 'chats' : [] },
+  'Euclid' : { 'key': 671, 'count': 0, 'members' : [], 'chats' : [] },
+  'Kruskal' : { 'key': 214, 'count': 0, 'members' : [], 'chats' : [] },
+  'Fisher-yates' : { 'key': 903, 'count': 0, 'members' : [], 'chats' : [] },
+  'Floyd-Warshall' : { 'key': 830, 'count': 0, 'members' : [], 'chats' : [] },
+  'Bellman-Ford' : { 'key': 543, 'count': 0, 'members' : [], 'chats' : [] },
+  'Hoffman' : { 'key': 862, 'count': 0, 'members' : [], 'chats' : [] },
+  'DP' : { 'key': 384, 'count': 0, 'members' : [], 'chats' : [] },
+  'A*' : { 'key': 097, 'count': 0, 'members' : [], 'chats' : [] }
+};
+
+//방 및 방의 카운터 전달
 var get_state = function(){
   var state = [];
   var index = 0;
@@ -29,54 +41,59 @@ var get_state = function(){
   return state;
 }
 
+
 io.on('connection', function(user_socket){
   
   user_socket.on('login',function(packet){
+    var name;
     var key = packet['chat_room_key'];
-    var id = packet['chat_member_id'];
-    var access = true;
+    var nickname = packet['chat_member_nickname'];
+    var access = false;
     
-    if(key != '' && id != ''){
-      user_socket.room = key;
-      user_socket.nickname = id;
-      user_socket.join(key);
-      
-      //room과 socket 객체에 요소 추가
-      if(room[key] == undefined)
-        room[key] = {'count': 0, 'members' : [id], 'chats' : []};
-      else if( room[key]['members'].indexOf(id) == -1 )
-        room[key]['members'].push(id);
-      else 
-        access = false;
+    if(key != '' && nickname != ''){
+
+      for(i in room){
+        if(room[i].key == key){ 
+          name = i;
+
+          if( room[i]['members'].indexOf(nickname) == -1 ){
+            access = true;
+            room[name]['members'].push(nickname);
+            user_socket.room = name;
+            user_socket.nickname = nickname;
+            user_socket.join(name);
+          } else { access == false; }
+        }
+      }
         
       if( access ){
-        console.log( key+" - '"+id+"'님이 입장했습니다.");
+        console.log( name+" - '"+nickname+"'님이 입장했습니다.");
 
         //채팅방 데이터 보내기
         user_socket.emit('load', {
+          'chat_room' : name,
+          'chat_nickname' : nickname,
           'chat_state' : get_state(),
-          'chat_count' : room[key]['count'],
-          'chat_members' : room[key]['members'],
-          'chat_history' : room[key]['chats']
+          'chat_count' : room[name]['count'],
+          'chat_members' : room[name]['members'],
+          'chat_history' : room[name]['chats']
         });
 
         //상태 새로고침
-        io.sockets.emit('refresh',{
+        io.sockets.in(name).emit('refresh',{
           'chat_state': get_state(),
-          'chat_key' : key,
-          'chat_members' : room[key]['members'],
+          'chat_room' : name,
+          'chat_members' : room[name]['members'],
         });
-        user_socket.emit('access',true);
+        user_socket.emit('access',{ 'chk' : true, 'room' : name });
       }
-      else
-        user_socket.emit('access',false);
-    } else{
-     user_socket.emit('access',false); 
-    }
+    } 
+
+    if( access == false) user_socket.emit('access',{ 'chk' : false });
   });
 
   user_socket.on('send',function(packet){
-    var key = user_socket.room;
+    var name = user_socket.room;
     var chat = {
       'chat_member_id': user_socket.nickname,
       'chat_type': packet['chat_type'],
@@ -84,17 +101,17 @@ io.on('connection', function(user_socket){
       'chat_time': packet['chat_time']
     }
     
-    console.log(chat['chat_member_id']+"("+key+") : "+chat['chat_text']);
+    console.log(chat['chat_member_id']+"("+name+") : "+chat['chat_text']);
   
     //채팅 카운트 증가
     if( chat.chat_type == 'default' )
-      room[key].count += 1;
+      room[name].count += 1;
     
     //채팅내역 저장
-    room[key]['chats'].push(chat);
+    room[name]['chats'].push(chat);
     
     //다른 유저들 채팅내역 및 상태 반영
-    io.sockets.in(key).emit('broadcast', { 'chat' : [chat], 'count':room[key].count});
+    io.sockets.in(name).emit('broadcast', { 'chat' : [chat], 'count':room[name].count});
     
     //상태 새로고침
     io.sockets.emit('refresh',{
@@ -103,14 +120,12 @@ io.on('connection', function(user_socket){
   });
   
   user_socket.on('count_tool',function(packet){
-    var key = user_socket.room;
+    var name = user_socket.room;
     var type = packet.type;
     var val = packet.value;
-    
-    console.log(packet);
-    console.log(key+" "+type+" "+val);
+
     if( type == 'edit' ){
-      room[key].count = val;
+      room[name].count = val;
       io.sockets.emit('refresh',{
         'chat_state': get_state(),
         'chat_count': val
@@ -122,42 +137,36 @@ io.on('connection', function(user_socket){
         'chat_count': 0
       });
     }
-    
   });
   
   user_socket.on('typing',function(packet){
-    var key = user_socket.room;
+    var name = user_socket.room;
     var id = user_socket.nickname;
     var state = packet.state;
     
-    io.sockets.in(key).emit('typing', {'id': id, 'state': state});
+    io.sockets.in(name).emit('typing', {'id': id, 'state': state});
   });
 
   user_socket.on('disconnect', function(packet){
-    var key = user_socket.room;
+    var name = user_socket.room;
     var id = user_socket.nickname;
     var chat_members;
     
-    if ( key != undefined ){
-      var memlist = room[key].members;
+    if ( name != undefined ){
+      var memlist = room[name].members;
       
-      console.log( key+" - '"+id+"'님이 퇴장했습니다.");
+      console.log( name+" - '"+id+"'님이 퇴장했습니다.");
+      user_socket.leave(name);
 
       //멤버 제거
       memlist.splice(memlist.indexOf(id),1);
-      //방 폭파!      
-      if( memlist.length == 0 ){
-        user_socket.leave(key);
-        delete room[key];
-        chat_members = undefined;
-      } else {
-        chat_members = room[key]['members'];
-      }
+
+      chat_members = room[name]['members'];
       
       io.sockets.emit('refresh',{
         'chat_state': get_state(),
-        'chat_key' : key,
-        'chat_members' : chat_members,
+        'chat_room' : name,
+        'chat_members' : chat_members
       });
     }
   });

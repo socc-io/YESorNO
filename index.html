@@ -23,7 +23,7 @@
       <img src="login.png">
       <div class="row">
         <div class="col-lg-6">
-          <input name="key" type="text" class="form-control" placeholder="팜플렛에 적힌 키를 입력하세요.">
+          <input name="key" type="text" class="form-control" placeholder="칩에 적힌 숫자를 입력하세요.">
         </div>
         <div class="col-lg-6">
           <div class="input-group">
@@ -40,7 +40,7 @@
     <div id="status">
       <div class="info">
         <div class="logo">Yes or No</div>
-        <div id="nickname">두더지1</div>
+        <div id="nickname"></div>
       </div>
       <div class="team">
         <h4>team</h4>
@@ -76,21 +76,11 @@
 
     $('.login').click(function(){
       var key = $('input[name=key]').val();
-      var id = $('input[name=nickname]').val();
-      socket.room = key;
-      socket.nickname = id;
-      
-      socket.emit('login',{chat_room_key : key , chat_member_id : id});
-      
-      socket.on('access',function(chk){
-        if( chk == true ){
-          $('#login').hide(); 
-          $('#chat').fadeIn();
-        }else {
-          alert("입력하신 키와 닉네임을 확인해주세요.\n( 비거나 동일한 닉네임을 가진 팀원이 있는지 확인해주세요. )");
-        }
-      });
+      var nickname = $('input[name=nickname]').val();
+
+      socket.emit('login',{chat_room_key : key , chat_member_nickname : nickname});
     });   
+
     $('input[name="chat"]').keypress(function(e){
       var code = (e.keyCode ? e.keyCode : e.which);
       var text = $(this).val();
@@ -119,6 +109,13 @@
     
     
     // 소켓 이벤트
+    socket.on('access',function(data){
+      if( data.chk ){
+        $('#login').hide(); 
+        $('#chat').fadeIn();
+      }else if( data.chk == false ){
+        alert("입력하신 숫자와 닉네임을 확인해주세요.\n( 비거나 동일한 닉네임을 가진 팀원이 있는지 확인해주세요. )");
+      }}); 
     socket.on('load',function(o){load(o)});
     socket.on('broadcast',function(o){broadcast(o)});
     socket.on('refresh',function(o){refresh(o)});

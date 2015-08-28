@@ -1,9 +1,8 @@
 //로그인할 때 패킷
 login
 {
- chat_room_key : "dp",
- chat_member_id : "member_id",
- chat_level : 9 (1 == master)
+ chat_room_num : "272",
+ chat_member_nickname : "nickname",
 }
 
 //이전 채팅 로딩 패킷

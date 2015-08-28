@@ -48,8 +48,13 @@ var count_tool = function(socket,type,value){
 }
 
 var load = function(o){
+  socket.nickname = o['chat_nickname'];
+  socket.room = o['chat_room'];
+
   $('#nickname').html(socket.nickname);
   $('.team-name').html(socket.room);
+
+  //상단 카운트
   $('.badge.me').html(o['chat_count']);
 
   //room, user 리스트 추가
@@ -58,7 +63,6 @@ var load = function(o){
   
   //이전 채팅 로드
   add_Message(o['chat_history']);
-  bottom_scroll();
 }
 var broadcast = function(o){
   $('.badge.me').html(o['count']);
@@ -67,7 +71,7 @@ var broadcast = function(o){
 var refresh = function(o){
   //room, user 리스트 갱신
   add_RoomList(o['chat_state']);
-  if(o['chat_key'] == socket.room) add_UserList(o['chat_members']);
+  if(o['chat_room'] == socket.room) add_UserList(o['chat_members']);
   if(o['chat_count'] != undefined) $('.badge.me').html(o['chat_count']);
 };
 var typing = function(o){
