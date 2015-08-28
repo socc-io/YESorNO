@@ -36,7 +36,7 @@ var add_Message = function(data){
     var id = data[i].chat_member_id;
     var text = data[i].chat_text;
     var time = data[i].chat_time;
-    var img = ( id == 'master' ) ? 'master.jpeg' : '1.jpg';
+    var img = ( id == 'master' ) ? 'master.jpeg' : 'guest.jpg';
     var message = '<li class="media"><div class="media-left"><img class="media-object img-circle" src="'+img+'" alt="img"></div><div class="media-body"><h4 class="media-heading nickname">'+id+'<span class="time">'+time+'</span></h4>'+text+'</div></li>'
     $('.media-list').append(message);
   }

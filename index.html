@@ -19,21 +19,22 @@
   
 <body>
   <div id="login">
-    <div class="row">
-      <div class="col-lg-6">
-        <input name="key" type="text" class="form-control" placeholder="팜플렛에 적힌 키를 입력하세요." value="dpdp">
+    <div class="frame">
+      <img src="login.png">
+      <div class="row">
+        <div class="col-lg-6">
+          <input name="key" type="text" class="form-control" placeholder="팜플렛에 적힌 키를 입력하세요.">
+        </div>
+        <div class="col-lg-6">
+          <div class="input-group">
+            <input name="nickname"  type="text" class="form-control" placeholder="사용하실 닉네임을 입력하세요.">
+            <span class="input-group-btn">
+              <button class="login btn btn-default" type="button">Go!</button>
+            </span>
+          </div><!-- /input-group -->
+        </div>
       </div><!-- /.col-lg-6 -->
     </div>
-    <div class="row">
-      <div class="col-lg-6">
-        <div class="input-group">
-          <input name="nickname"  type="text" class="form-control" placeholder="사용하실 닉네임을 입력하세요.">
-          <span class="input-group-btn">
-            <button class="login btn btn-default" type="button">Go!</button>
-          </span>
-        </div><!-- /input-group -->
-      </div><!-- /.col-lg-6 -->
-    </div><!-- /.row -->
   </div>
   <div id="chat" style="display:none">
     <div id="status">
@@ -86,7 +87,7 @@
           $('#login').hide(); 
           $('#chat').fadeIn();
         }else {
-          console.log("비밀번호를 다시 한번 확인 해주세요.");
+          alert("입력하신 키와 닉네임을 확인해주세요.\n( 비거나 동일한 닉네임을 가진 팀원이 있는지 확인해주세요. )");
         }
       });
     });   
