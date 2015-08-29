@@ -58,7 +58,10 @@ io.on('connection', function(user_socket){
 
           if( room[i]['members'].indexOf(nickname) == -1 ){
             access = true;
-            room[name]['members'].push(nickname);
+
+            if( nickname == 'master')  room[name]['members'].unshift(nickname);
+            else room[name]['members'].push(nickname);
+
             user_socket.room = name;
             user_socket.nickname = nickname;
             user_socket.join(name);
@@ -125,9 +128,10 @@ io.on('connection', function(user_socket){
     var val = packet.value;
 
     if( type == 'edit' ){
-      room[name].count = val;
+      room[name].count = val*1;
       io.sockets.emit('refresh',{
         'chat_state': get_state(),
+        'chat_room':name,
         'chat_count': val
       });
     }else if( type == 'reset' ){

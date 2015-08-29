@@ -71,8 +71,11 @@ var broadcast = function(o){
 var refresh = function(o){
   //room, user 리스트 갱신
   add_RoomList(o['chat_state']);
-  if(o['chat_room'] == socket.room) add_UserList(o['chat_members']);
-  if(o['chat_count'] != undefined) $('.badge.me').html(o['chat_count']);
+  if(o['chat_room'] == socket.room){
+    add_UserList(o['chat_members']);
+    if(o['chat_count'] != undefined) $('.badge.me').html(o['chat_count']);  
+  } 
+  
 };
 var typing = function(o){
   temp = o;
