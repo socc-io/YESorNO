@@ -132,13 +132,21 @@ io.on('connection', function(user_socket){
       io.sockets.emit('refresh',{
         'chat_state': get_state(),
         'chat_room':name,
+        'chat_count': val,
+        'chat_members' : room[name]['members']
+      });
+      console.log({
+        'chat_state': get_state(),
+        'chat_room':name,
         'chat_count': val
       });
     }else if( type == 'reset' ){
       room[key].count = 0;
       io.sockets.emit('refresh',{
         'chat_state': get_state(),
-        'chat_count': 0
+        'chat_room':name,
+        'chat_count': 0,
+        'chat_members' : room[name]['members']
       });
     }
   });

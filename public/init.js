@@ -24,6 +24,7 @@ var add_RoomList = function(data){
 var add_UserList = function(data){
   $('.user-list').empty();
   
+  console.log(data);
   for(i in data){
     if(data[i] == socket.nickname)
       $('.user-list').append('<li class="active">'+data[i]+'</li>');
@@ -71,7 +72,9 @@ var broadcast = function(o){
 var refresh = function(o){
   //room, user 리스트 갱신
   add_RoomList(o['chat_state']);
+  
   if(o['chat_room'] == socket.room){
+    console.log(o['chat_members']);
     add_UserList(o['chat_members']);
     if(o['chat_count'] != undefined) $('.badge.me').html(o['chat_count']);  
   } 
